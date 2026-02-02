@@ -30,11 +30,17 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Set permissions
+# Create .env file if it doesn't exist
+RUN cp -n .env.production .env || true
+
+# Set permissions for Laravel and installation requirements
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache \
-    && chmod -R 755 /var/www/html/public
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/public \
+    && chmod 666 /var/www/html/.env \
+    && chmod 666 /var/www/html/config/system-addons.php \
+    && chmod 666 /var/www/html/app/Providers/RouteServiceProvider.php
 
 # Copy nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
@@ -42,11 +48,8 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 # Copy supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Create storage symlink and cache
-RUN php artisan storage:link || true \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# Create storage symlink (skip cache since .env needs setup)
+RUN php artisan storage:link || true
 
 # Expose port
 EXPOSE 80
