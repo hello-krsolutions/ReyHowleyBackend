@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     container_name: 6ammart-app
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
       - APP_NAME=6amMart
       - APP_ENV=production
