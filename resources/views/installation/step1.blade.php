@@ -186,7 +186,7 @@
                 <p>All the permissions are provided successfully ? </p>
 
                 @if ($permission['curl_enabled'] == 1 && $permission['db_file_write_perm'] == 1 &&  $permission['config_file_write_perm'] == 1 && $permission['routes_file_write_perm'] == 1 && $phpVersion >= 8.2)
-                    <a href="{{ route('step2',['token'=>bcrypt('step_2')]) }}" class="btn btn-dark px-sm-5">Proceed
+                    <a href="{{ route('step3',['token'=>bcrypt('step_3')]) }}" class="btn btn-dark px-sm-5">Proceed
                         Next</a>
                 @endif
             </div>

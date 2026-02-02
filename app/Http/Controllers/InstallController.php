@@ -62,6 +62,9 @@ class InstallController extends Controller
     public function step3(Request $request)
     {
         if (Hash::check('step_3', $request['token'])) {
+            // Auto-set purchase credentials for open-source version
+            Session::put('purchase_key', 'open_source');
+            Session::put('username', 'open_source');
             return view('installation.step3');
         }
         session()->flash('error', 'Access denied!');
