@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     libsodium-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
     zip \
     unzip \
     nginx \
@@ -18,8 +20,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install PHP extensions (per 6ammart prerequisites)
 # Note: ctype, tokenizer, xml, json, openssl are already compiled into php:8.2-fpm
-# We install: pdo_mysql, mysqli, mbstring, bcmath, gd, zip, opcache, exif, pcntl, fileinfo, sodium
-RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache fileinfo sodium
+# We install: pdo_mysql, mysqli, mbstring, bcmath, gd (with freetype), zip, opcache, exif, pcntl, fileinfo, sodium
+# Configure GD with FreeType support (required for captcha imagettfbbox function)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache fileinfo sodium
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
