@@ -9,7 +9,8 @@ services:
     environment:
       - APP_NAME=ReyHowley
       - APP_ENV=production
-      - APP_DEBUG=true
+      - APP_DEBUG=false
+      - APP_INSTALL=true
       - APP_URL=${APP_URL:-https://reyhowley.com}
       - DB_CONNECTION=mysql
       - DB_HOST=db
