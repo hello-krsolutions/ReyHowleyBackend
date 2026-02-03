@@ -10,14 +10,14 @@ services:
     environment:
       - APP_NAME=6amMart
       - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_URL=${APP_URL:-http://localhost}
+      - APP_DEBUG=true
+      - APP_URL=${APP_URL:-https://reyhowley.com}
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-6ammart}
-      - DB_USERNAME=${DB_USERNAME:-6ammart}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_DATABASE=${DB_DATABASE:-reyhowley}
+      - DB_USERNAME=${DB_USERNAME:-reyhowley}
+      - DB_PASSWORD=${DB_PASSWORD:-MySuccess@6264}
       - CACHE_DRIVER=database
       - SESSION_DRIVER=file
       - QUEUE_CONNECTION=sync
@@ -34,10 +34,10 @@ services:
     container_name: 6ammart-db
     restart: unless-stopped
     environment:
-      - MYSQL_DATABASE=${DB_DATABASE:-6ammart}
-      - MYSQL_USER=${DB_USERNAME:-6ammart}
-      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
+      - MYSQL_DATABASE=${DB_DATABASE:-reyhowley}
+      - MYSQL_USER=${DB_USERNAME:-reyhowley}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-MySuccess@6264}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-MySuccess@6264}
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
