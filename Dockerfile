@@ -54,6 +54,10 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Create storage symlink (skip cache since .env needs setup)
 RUN php artisan storage:link || true
 
+# Create public/public symlink for asset()helper compatibility
+# The 6ammart views use asset('public/...') but Nginx root is already /public
+RUN cd /var/www/html/public && ln -sf . public
+
 # Expose port
 EXPOSE 80
 
