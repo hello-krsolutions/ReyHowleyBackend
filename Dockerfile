@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    libsodium-dev \
     zip \
     unzip \
     nginx \
@@ -16,9 +17,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions (per 6ammart prerequisites)
-# Required: BCMath, Ctype, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML, Zip, Fileinfo, Gd, Sodium, MySQL PDO, mysqli
-RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache xml ctype tokenizer fileinfo \
-    && docker-php-ext-enable sodium
+# Note: ctype, tokenizer, xml, json, openssl are already compiled into php:8.2-fpm
+# We install: pdo_mysql, mysqli, mbstring, bcmath, gd, zip, opcache, exif, pcntl, fileinfo, sodium
+RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache fileinfo sodium
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
