@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use App\Traits\AddonHelper;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Config;
@@ -28,19 +29,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Force HTTPS for URL generation in production (behind SSL-terminating proxy)
+        if (config('app.env') === 'production' || str_starts_with(config('app.url'), 'https')) {
+            URL::forceScheme('https');
+        }
 
-        try
-        {
-            Config::set('addon_admin_routes',$this->get_addon_admin_routes());
-            Config::set('get_payment_publish_status',$this->get_payment_publish_status());
+        try {
+            Config::set('addon_admin_routes', $this->get_addon_admin_routes());
+            Config::set('get_payment_publish_status', $this->get_payment_publish_status());
             Paginator::useBootstrap();
-            foreach(Helpers::get_view_keys() as $key=>$value)
-            {
+            foreach (Helpers::get_view_keys() as $key => $value) {
                 view()->share($key, $value);
             }
-        }
-        catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
 
         }
 
