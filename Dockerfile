@@ -15,8 +15,10 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip opcache
+# Install PHP extensions (per 6ammart prerequisites)
+# Required: BCMath, Ctype, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML, Zip, Fileinfo, Gd, Sodium, MySQL PDO, mysqli
+RUN docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache xml ctype tokenizer fileinfo \
+    && docker-php-ext-enable sodium
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
