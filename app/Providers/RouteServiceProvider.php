@@ -48,9 +48,31 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/install.php'));
+            // Check if the application is installed
+            if (env('APP_INSTALL') == true) {
+                // Application is installed - load normal routes
+                Route::prefix('api')
+                    ->middleware('api')
+                    ->namespace($this->namespace . '\Api')
+                    ->group(base_path('routes/api.php'));
+
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group(base_path('routes/web.php'));
+
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group(base_path('routes/admin.php'));
+
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group(base_path('routes/vendor.php'));
+            } else {
+                // Application is not installed - load installation routes
+                Route::middleware('web')
+                    ->namespace($this->namespace)
+                    ->group(base_path('routes/install.php'));
+            }
         });
     }
 
