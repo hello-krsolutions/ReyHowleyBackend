@@ -38,8 +38,10 @@ class AppServiceProvider extends ServiceProvider
             Config::set('addon_admin_routes', $this->get_addon_admin_routes());
             Config::set('get_payment_publish_status', $this->get_payment_publish_status());
             Paginator::useBootstrap();
-            foreach (Helpers::get_view_keys() as $key => $value) {
-                view()->share($key, $value);
+            if (env('APP_INSTALL')) {
+                foreach (Helpers::get_view_keys() as $key => $value) {
+                    view()->share($key, $value);
+                }
             }
         } catch (\Exception $e) {
 
