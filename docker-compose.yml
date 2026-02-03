@@ -8,7 +8,7 @@ services:
     expose:
       - "80"
     environment:
-      - APP_NAME=6amMart
+      - APP_NAME=ReyHowley
       - APP_ENV=production
       - APP_DEBUG=true
       - APP_URL=${APP_URL:-https://reyhowley.com}
