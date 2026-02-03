@@ -2122,16 +2122,16 @@ class Helpers
                     $image = $image->encode(new WebpEncoder(quality: 80));
                     $format = 'webp';
                 }
-                $imageName = \Carbon\Carbon::now()->toDateString() . '-' . uniqid() . '.' . $format;
+                $imageName = \Carbon\Carbon::now()->toDateString().'-'.uniqid().'.'.$format;
 
-                if (!Storage::disk(self::getDisk())->exists($dir)) {
+                if (! Storage::disk(self::getDisk())->exists($dir)) {
                     Storage::disk(self::getDisk())->makeDirectory($dir);
                 }
 
                 if ($image instanceof UploadedFile) {
                     Storage::disk(self::getDisk())->putFileAs($dir, $image, $imageName);
                 } else {
-                    Storage::disk(self::getDisk())->put($dir . '/' . $imageName, $image->toString());
+                    Storage::disk(self::getDisk())->put($dir.'/'.$imageName, $image->toString());
                 }
 
             } else {
@@ -2956,22 +2956,77 @@ class Helpers
 
     public static function react_activation_check($react_domain, $react_license_code)
     {
-        // Open source version - always return true
-        return true;
+        $scheme = str_contains($react_domain, 'localhost') ? 'http://' : 'https://';
+        $url = empty(parse_url($react_domain)['scheme']) ? $scheme . ltrim($react_domain, '/') : $react_domain;
+        $response = Http::post('https://store.6amtech.com/api/v1/customer/license-check', [
+            'domain_name' => str_ireplace('www.', '', parse_url($url, PHP_URL_HOST)),
+            'license_code' => $react_license_code
+        ]);
+        return ($response->successful() && isset($response->json('content')['is_active']) && $response->json('content')['is_active']);
     }
 
     public static function activation_submit($purchase_key)
     {
-        // Open source version - always return true
-        return true;
+        $post = [
+            'purchase_key' => $purchase_key
+        ];
+        $live = 'https://check.6amtech.com';
+        $ch = curl_init($live . '/api/v1/software-check');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+        $response_body = json_decode($response, true);
+
+        try {
+            if ($response_body['is_valid'] && $response_body['result']['item']['id'] == env('REACT_APP_KEY')) {
+                $previous_active = json_decode(BusinessSetting::where('key', 'app_activation')->first()->value ?? '[]');
+                $found = 0;
+                foreach ($previous_active as $key => $item) {
+                    if ($item->software_id == env('REACT_APP_KEY')) {
+                        $found = 1;
+                    }
+                }
+                if (!$found) {
+                    $previous_active[] = [
+                        'software_id' => env('REACT_APP_KEY'),
+                        'is_active' => 1
+                    ];
+                    Helpers::businessUpdateOrInsert(['key' => 'app_activation'], [
+                        'value' => json_encode($previous_active)
+                    ]);
+                }
+                return true;
+            }
+
+        } catch (\Exception $exception) {
+            info($exception->getMessage());
+
+            $previous_active[] = [
+                'software_id' => env('REACT_APP_KEY'),
+                'is_active' => 1
+            ];
+            Helpers::businessUpdateOrInsert(['key' => 'app_activation'], [
+                'value' => json_encode($previous_active)
+            ]);
+
+            return true;
+        }
+        return false;
     }
 
     public static function react_domain_status_check()
     {
-        // Open source version - always set active status
         $data = self::get_business_settings('react_setup');
-        if ($data && isset($data['react_domain'])) {
-            $data['status'] = 1;
+        if ($data && isset($data['react_domain']) && isset($data['react_license_code'])) {
+            if (isset($data['react_platform']) && $data['react_platform'] == 'codecanyon') {
+                $data['status'] = (int) self::activation_submit($data['react_license_code']);
+            } elseif (!self::react_activation_check($data['react_domain'], $data['react_license_code'])) {
+                $data['status'] = 0;
+            } elseif ($data['status'] != 1) {
+                $data['status'] = 1;
+            }
             Helpers::businessUpdateOrInsert(['key' => 'react_setup'], [
                 'value' => json_encode($data)
             ]);
@@ -4676,61 +4731,61 @@ class Helpers
 
     public static function validateFile($image)
     {
-        if (!$image instanceof UploadedFile) {
+        if (! $image instanceof UploadedFile) {
             throw new InvalidUploadException('Invalid file upload.');
         }
 
         if ($image->getSize() > MAX_FILE_SIZE * 1024 * 1024) {
-            throw new InvalidUploadException('File size exceeds the limit of ' . MAX_FILE_SIZE . 'MB');
+            throw new InvalidUploadException('File size exceeds the limit of '.MAX_FILE_SIZE.'MB');
         }
 
-        $allowedExtensions = explode(',', IMAGE_EXTENSION . ',' . VIDEO_EXTENSION . ',' . DOCUMENT_EXTENSION . ',' . AUDIO_EXTENSION . ',' . FILE_EXTENSION);
+        $allowedExtensions = explode(',', IMAGE_EXTENSION.','.VIDEO_EXTENSION.','.DOCUMENT_EXTENSION.','.AUDIO_EXTENSION.','.FILE_EXTENSION);
         $allowedExtensions = array_map(function ($ext) {
             return str_replace('.', '', trim($ext));
         }, $allowedExtensions);
 
         $extension = strtolower($image->getClientOriginalExtension());
 
-        if (!$extension || $extension == '') {
-            $extension = self::extensionFromMimeType($image->getMimeType());
+        if(!$extension || $extension == '') {
+            $extension= self::extensionFromMimeType($image->getMimeType());
         }
 
-        if (!in_array($extension, $allowedExtensions)) {
+        if (! in_array($extension, $allowedExtensions)) {
             throw new InvalidUploadException('File type not allowed.');
         }
     }
 
-    public static function extensionFromMimeType(string $mimeType): string
+   public static function extensionFromMimeType(string $mimeType): string
     {
         $mimeType = strtolower($mimeType);
 
         $map = [
-            // images
-            'image/jpeg' => 'jpg',   // jpeg / jpg
-            'image/png' => 'png',
-            'image/gif' => 'gif',
-            'image/webp' => 'webp',
+        // images
+        'image/jpeg' => 'jpg',   // jpeg / jpg
+        'image/png'  => 'png',
+        'image/gif'  => 'gif',
+        'image/webp' => 'webp',
 
-            // video
-            'video/mp4' => 'mp4',
-            'video/webm' => 'webm',
-            'video/ogg' => 'ogg',
+        // video
+        'video/mp4'  => 'mp4',
+        'video/webm' => 'webm',
+        'video/ogg'  => 'ogg',
 
-            // audio
-            'audio/mpeg' => 'mp3',
-            'audio/wav' => 'wav',
-            'audio/ogg' => 'ogg',
+        // audio
+        'audio/mpeg' => 'mp3',
+        'audio/wav'  => 'wav',
+        'audio/ogg'  => 'ogg',
 
-            // documents
-            'application/pdf' => 'pdf',
-            'application/msword' => 'doc',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-            'application/vnd.ms-excel' => 'excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
+        // documents
+        'application/pdf' => 'pdf',
+        'application/msword' => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+        'application/vnd.ms-excel' => 'excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
 
-            // archive / misc
-            'application/zip' => 'zip',
-            'application/octet-stream' => 'p8',
+        // archive / misc
+        'application/zip' => 'zip',
+        'application/octet-stream' => 'p8',
         ];
 
         if (isset($map[$mimeType])) {

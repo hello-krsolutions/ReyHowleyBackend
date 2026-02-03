@@ -30,8 +30,8 @@ trait ActivationClass
 
     public function getSystemAddonCacheKey(string|null $app = 'default'): string
     {
-        $appName = env('APP_NAME') . '_cache';
-        return str_replace('-', '_', Str::slug($appName . 'cache_system_addons_for_' . $app . '_' . $this->getDomain()));
+        $appName = env('APP_NAME').'_cache';
+        return str_replace('-', '_', Str::slug($appName.'cache_system_addons_for_' . $app . '_' . $this->getDomain()));
     }
 
     public function getAddonsConfig(): array
@@ -62,26 +62,57 @@ trait ActivationClass
 
     public function getRequestConfig(string|null $username = null, string|null $purchaseKey = null, string|null $softwareId = null, string|null $softwareType = null): array
     {
-        // Open source version - bypass external API validation
+        $activeStatus = base64_encode(1);
+        if(!$this->is_local()) {
+            try {
+                $response = Http::post(base64_decode('aHR0cHM6Ly9jaGVjay42YW10ZWNoLmNvbS9hcGkvdjIvcmVnaXN0ZXItZG9tYWlu'), [
+                    base64_decode('dXNlcm5hbWU=') => trim($username),
+                    base64_decode('cHVyY2hhc2Vfa2V5') => $purchaseKey,
+                    base64_decode('c29mdHdhcmVfaWQ=') => base64_decode($softwareId ?? SOFTWARE_ID),
+                    base64_decode('ZG9tYWlu') => $this->getDomain(),
+                    base64_decode('c29mdHdhcmVfdHlwZQ==') => $softwareType,
+                ])->json();
+                $activeStatus = $response['active'] ?? base64_encode(1);
+            } catch (\Exception $exception) {
+                $activeStatus = base64_encode(1);
+            }
+        }
+
         return [
-            "active" => "1",
-            "username" => trim($username ?? ''),
-            "purchase_key" => $purchaseKey ?? 'open_source',
-            "software_id" => $softwareId ?? (defined('SOFTWARE_ID') ? SOFTWARE_ID : ''),
+            "active" => base64_decode($activeStatus),
+            "username" => trim($username),
+            "purchase_key" => $purchaseKey,
+            "software_id" => $softwareId ?? SOFTWARE_ID,
             "domain" => $this->getDomain(),
-            "software_type" => $softwareType ?? 'product',
+            "software_type" => $softwareType,
         ];
     }
 
     public function checkActivationCache(string|null $app)
     {
-        // Open source version - always return true, no validation needed
-        return true;
+        if ($this->is_local() || is_null($app) || env('DEVELOPMENT_ENVIRONMENT', false)) {
+            return true;
+        }
+
+        $config = $this->getAddonsConfig();
+        $cacheKey = $this->getSystemAddonCacheKey(app: $app);
+
+        if (isset($config[$app]) && (!isset($config[$app]['active']) || $config[$app]['active'] == 0)) {
+            Cache::forget($cacheKey);
+            return false;
+        } else {
+            $appConfig = $config[$app];
+            return Cache::remember($cacheKey, $this->getCacheTimeoutByDays(days: 1), function () use ($app, $appConfig) {
+                $response = $this->getRequestConfig(username: $appConfig['username'], purchaseKey: $appConfig['purchase_key'], softwareId: $appConfig['software_id'], softwareType: $appConfig['software_type'] ?? base64_decode('cHJvZHVjdA=='));
+                $this->updateActivationConfig(app: $app, response: $response);
+                return (bool)$response['active'];
+            });
+        }
     }
 
     public function updateActivationConfig($app, $response): void
     {
-        if ('admin.business-settings.addon-activation.index' === \Illuminate\Support\Facades\Route::currentRouteName()) {
+        if('admin.business-settings.addon-activation.index' === \Illuminate\Support\Facades\Route::currentRouteName() ){
             return;
         }
         $config = $this->getAddonsConfig();
