@@ -3,10 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: 6ammart-app
     restart: unless-stopped
-    expose:
-      - "80"
+    ports:
+      - "80:80"
     environment:
       - APP_NAME=ReyHowley
       - APP_ENV=production
@@ -27,11 +26,10 @@ services:
       db:
         condition: service_healthy
     networks:
-      - 6ammart-network
+      - default
 
   db:
     image: mysql:8.0
-    container_name: 6ammart-db
     restart: unless-stopped
     environment:
       - MYSQL_DATABASE=${DB_DATABASE:-reyhowley}
@@ -46,7 +44,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - 6ammart-network
+      - default
 
 volumes:
   db_data:
@@ -54,5 +52,5 @@ volumes:
 
 
 networks:
-  6ammart-network:
+  default:
     driver: bridge
