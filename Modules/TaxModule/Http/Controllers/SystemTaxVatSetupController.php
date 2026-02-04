@@ -52,7 +52,7 @@ class SystemTaxVatSetupController extends Controller
             ->first();
 
         if ($this->getProjectName() == '6ammart' && $systemTaxVat?->tax_payer == 'vendor') {
-            $systemTaxVatForPrescription = $this->systemTaxVat->with('additionalData')->when($this->getCountryType() !== 'single', function ($query) use($request) {
+            $systemTaxVatForPrescription = $this->systemTaxVat->with('additionalData')->when($this->getCountryType() !== 'single', function ($query) use ($request) {
                 $query->where('country_code', $request->country_code);
             })
                 ->where('tax_payer', 'prescription')
@@ -78,7 +78,8 @@ class SystemTaxVatSetupController extends Controller
     {
         if ($request->tax_status != 'include') {
             $this->validateRequest($request);
-        };
+        }
+        ;
 
         $this->updateSystemTaxData($request, $request->system_tax_id, $request->tax_ids, $request->tax_status);
         if ($request->prescription_system_tax_id && $request->tax_ids_for_prescription) {
@@ -101,7 +102,7 @@ class SystemTaxVatSetupController extends Controller
         }
         $systemTaxVat->is_included = $tax_status == 'include' ? 1 : 0;
         $systemTaxVat->save();
-        foreach ($this->getPorjectWiseSystemData($systemTaxVat->tax_payer == 'vendor' ? 'additional_tax' : 'additional_tax_'.$systemTaxVat->tax_payer) ?? [] as $item) {
+        foreach ($this->getPorjectWiseSystemData($systemTaxVat->tax_payer == 'vendor' ? 'additional_tax' : 'additional_tax_' . $systemTaxVat->tax_payer) ?? [] as $item) {
             $taxOnAdditionalData = $this->taxOnAdditionalData->where('system_tax_setup_id', $systemTaxVat->id)->where('name', $item)->firstOrNew();
             $taxOnAdditionalData->name = $item;
             $taxOnAdditionalData->system_tax_setup_id = $systemTaxVat->id;
@@ -137,15 +138,15 @@ class SystemTaxVatSetupController extends Controller
                 $systemTaxVat->is_default = false;
             }
             $systemTaxVat->tax_payer = $request->type;
-            $systemTaxVat->tax_type = $request->tax_type ?? $request->type == 'rental_provider' ?  'trip_wise' : 'order_wise';
+            $systemTaxVat->tax_type = $request->tax_type ?? $request->type == 'rental_provider' ? 'trip_wise' : 'order_wise';
         }
         $systemTaxVat->is_active = !$systemTaxVat->is_active;
         $systemTaxVat->save();
 
-        if ($systemTaxVat?->tax_payer == 'vendor' && $this->getProjectName() == '6ammart') {
+        if ($systemTaxVat?->tax_payer == 'vendor' && $this->getProjectName() == 'reyhowley') {
 
             if ($request->prescription_system_id == null) {
-                $systemTaxVatForPrescription = $this->systemTaxVat->when($this->getCountryType() !== 'single', function ($query) use($request) {
+                $systemTaxVatForPrescription = $this->systemTaxVat->when($this->getCountryType() !== 'single', function ($query) use ($request) {
                     $query->where('country_code', $request->country_code);
                 })
                     ->where('tax_payer', 'prescription')
@@ -157,9 +158,9 @@ class SystemTaxVatSetupController extends Controller
             if (!$systemTaxVatForPrescription) {
                 $systemTaxVatForPrescription = new $this->systemTaxVat;
                 $systemTaxVatForPrescription->is_default = false;
-                $systemTaxVatForPrescription->is_included =  $systemTaxVat->is_included;
+                $systemTaxVatForPrescription->is_included = $systemTaxVat->is_included;
                 if ($this->getCountryType() !== 'single') {
-                    $systemTaxVatForPrescription->country_code =  $systemTaxVat->country_code;
+                    $systemTaxVatForPrescription->country_code = $systemTaxVat->country_code;
                 }
                 $systemTaxVatForPrescription->tax_payer = 'prescription';
                 $systemTaxVatForPrescription->tax_type = 'order_wise';
@@ -171,7 +172,7 @@ class SystemTaxVatSetupController extends Controller
             }
         }
 
-        return response()->json(['id' => $systemTaxVat->id, 'status' =>  $systemTaxVat->is_active, 'message' => translate('messages.vendor_tax_status_updated')]);
+        return response()->json(['id' => $systemTaxVat->id, 'status' => $systemTaxVat->is_active, 'message' => translate('messages.vendor_tax_status_updated')]);
     }
     private function validateRequest(Request $request, $id = null): void
     {
