@@ -37,8 +37,8 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Create .env file if it doesn't exist
-RUN cp -n .env.production .env || true
+# Create .env from production config (force overwrite)
+RUN cp -f .env.production .env || true
 
 # Set permissions for Laravel and installation requirements
 RUN chown -R www-data:www-data /var/www/html \
