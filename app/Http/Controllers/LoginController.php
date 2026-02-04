@@ -85,8 +85,8 @@ class LoginController extends Controller
         App::setLocale($locale);
         $custome_recaptcha = new CaptchaBuilder;
         $custome_recaptcha->setBackgroundColor(255, 255, 255);
-        $custome_recaptcha->setMaxBehindLines(2);
-        $custome_recaptcha->setMaxFrontLines(2);
+        $custome_recaptcha->setMaxBehindLines(0);
+        $custome_recaptcha->setMaxFrontLines(0);
         $custome_recaptcha->setDistortion(false);
         $custome_recaptcha->setInterpolation(false);
         $custome_recaptcha->build(150, 40);
@@ -156,7 +156,7 @@ class LoginController extends Controller
             ]);
         } else if (strtolower(session('six_captcha')) != strtolower($request->custome_recaptcha)) {
             Toastr::error(translate('messages.ReCAPTCHA Failed'));
-            return back();
+            return back()->withInput($request->only('email', 'remember'));
         }
 
         $ip = $request->ip();
@@ -283,8 +283,8 @@ class LoginController extends Controller
     {
         $custome_recaptcha = new CaptchaBuilder;
         $custome_recaptcha->setBackgroundColor(255, 255, 255);
-        $custome_recaptcha->setMaxBehindLines(2);
-        $custome_recaptcha->setMaxFrontLines(2);
+        $custome_recaptcha->setMaxBehindLines(0);
+        $custome_recaptcha->setMaxFrontLines(0);
         $custome_recaptcha->setDistortion(false);
         $custome_recaptcha->setInterpolation(false);
         $custome_recaptcha->build(150, 40);
