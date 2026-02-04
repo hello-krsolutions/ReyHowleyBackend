@@ -4,8 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
 
-class UpdateBrandingContent extends Migration
+class UpdateBrandingContentAndAdmin extends Migration
 {
     /**
      * Run the migrations.
@@ -31,6 +32,34 @@ class UpdateBrandingContent extends Migration
         DB::table('business_settings')->where('key', 'phone')->update(['value' => '+91 - 9052 11 44 88']);
         DB::table('business_settings')->where('key', 'email_address')->update(['value' => 'hello@reyhowley.com']);
         DB::table('business_settings')->where('key', 'address')->update(['value' => '#101, Siri Appartments, Masapeta, Rayachoty, Annamayya Dist, Andhra Pradesh, IN, 516269']);
+
+        // Update Admin Credentials
+        // Assuming the first admin (ID 1) is the super admin to update
+        $adminEmail = 'hello@reyhowley.com';
+        $adminPassword = Hash::make('MySuccess@2026');
+
+        $admin = DB::table('admins')->where('id', 1)->first();
+        if ($admin) {
+            DB::table('admins')->where('id', 1)->update([
+                'email' => $adminEmail,
+                'password' => $adminPassword,
+                'updated_at' => now(),
+            ]);
+        } else {
+            // Insert if not exists (fallback)
+            DB::table('admins')->insert([
+                'id' => 1,
+                'f_name' => 'Rey',
+                'l_name' => 'Howley',
+                'email' => $adminEmail,
+                'password' => $adminPassword,
+                'phone' => '0000000000',
+                'role_id' => 1, // Assuming 1 is super admin role
+                'image' => 'def.png',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 
     /**
