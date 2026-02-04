@@ -104,7 +104,7 @@ class InstallController extends Controller
         // return redirect($response.'?token='.bcrypt('step_3'));
         Session::put(base64_decode('cHVyY2hhc2Vfa2V5'), $request[base64_decode('cHVyY2hhc2Vfa2V5')]);//pk
         Session::put(base64_decode('dXNlcm5hbWU='), $request[base64_decode('dXNlcm5hbWU=')]);//un
-        return redirect('step3?token='.bcrypt('step_3'));
+        return redirect('step3?token=' . bcrypt('step_3'));
     }
 
     public function system_settings(Request $request)
@@ -129,13 +129,13 @@ class InstallController extends Controller
             'value' => $request['business_name']
         ]);
 
-        Helpers::insert_business_settings_key('system_language','[{"id":1,"direction":"ltr","code":"en","status":1,"default":true}]');
+        Helpers::insert_business_settings_key('system_language', '[{"id":1,"direction":"ltr","code":"en","status":1,"default":true}]');
 
         //version 2.2.0
-        Helpers::insert_data_settings_key('admin_login_url', 'login_admin' ,'admin');
-        Helpers::insert_data_settings_key('admin_employee_login_url', 'login_admin_employee' ,'admin-employee');
-        Helpers::insert_data_settings_key('store_login_url', 'login_store' ,'vendor');
-        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee' ,'vendor-employee');
+        Helpers::insert_data_settings_key('admin_login_url', 'login_admin', 'admin');
+        Helpers::insert_data_settings_key('admin_employee_login_url', 'login_admin_employee', 'admin-employee');
+        Helpers::insert_data_settings_key('store_login_url', 'login_store', 'vendor');
+        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee', 'vendor-employee');
 
         Helpers::insert_business_settings_key('check_daily_subscription_validity_check', date('Y-m-d'));
 
@@ -152,7 +152,7 @@ class InstallController extends Controller
 
         try {
             Madzipper::make('installation/backup/public.zip')->extractTo('storage/app');
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             info($exception);
         }
 
@@ -165,8 +165,8 @@ class InstallController extends Controller
         if (self::check_database_connection($request->DB_HOST, $request->DB_DATABASE, $request->DB_USERNAME, $request->DB_PASSWORD)) {
 
             $key = base64_encode(random_bytes(32));
-            $output = 'APP_NAME=6ammart'.time().
-                    'APP_ENV=live
+            $output = 'APP_NAME=ReyHowley' . time() .
+                'APP_ENV=live
                     APP_KEY=base64:' . $key . '
                     APP_DEBUG=false
                     APP_INSTALL=true
@@ -257,7 +257,7 @@ class InstallController extends Controller
             } else {
                 return false;
             }
-        }catch(\Exception $exception){
+        } catch (\Exception $exception) {
             return false;
         }
     }

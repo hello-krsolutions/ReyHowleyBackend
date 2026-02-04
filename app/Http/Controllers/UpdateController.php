@@ -45,7 +45,7 @@ class UpdateController extends Controller
         Helpers::setEnvironmentValue('APP_MODE', 'live');
         Helpers::setEnvironmentValue('SOFTWARE_VERSION', '3.6');
         Helpers::setEnvironmentValue('REACT_APP_KEY', '45370351');
-        Helpers::setEnvironmentValue('APP_NAME', '6amMart' . time());
+        Helpers::setEnvironmentValue('APP_NAME', 'ReyHowley' . time());
 
 
         // version_2.11.1
@@ -244,7 +244,8 @@ class UpdateController extends Controller
     private function set_data()
     {
         try {
-            $gateway = ['ssl_commerz_payment',
+            $gateway = [
+                'ssl_commerz_payment',
                 'razor_pay',
                 'paypal',
                 'stripe',
@@ -256,7 +257,8 @@ class UpdateController extends Controller
                 'liqpay',
                 'paytm',
                 'bkash',
-                'paytabs'];
+                'paytabs'
+            ];
 
             $data = BusinessSetting::whereIn('key', $gateway)->pluck('value', 'key')->toArray();
 
@@ -269,7 +271,8 @@ class UpdateController extends Controller
                 }
 
                 $decoded_value = json_decode($value, true);
-                $data = ['gateway' => $gateway,
+                $data = [
+                    'gateway' => $gateway,
                     'mode' => isset($decoded_value['status']) == 1 ? 'live' : 'test'
                 ];
 
@@ -332,7 +335,7 @@ class UpdateController extends Controller
                         'status' => $decoded_value['status'],
                         'access_token' => $decoded_value['access_token'],
                         'public_key' => $decoded_value['public_key'],
-                        'supported_country'=>''
+                        'supported_country' => ''
                     ];
                 } elseif ($gateway == 'liqpay') {
                     $additional_data = [
@@ -366,8 +369,10 @@ class UpdateController extends Controller
 
                 $credentials = json_encode(array_merge($data, $additional_data));
 
-                $payment_additional_data = ['gateway_title' => ucfirst(str_replace('_', ' ', $gateway)),
-                    'gateway_image' => null];
+                $payment_additional_data = [
+                    'gateway_title' => ucfirst(str_replace('_', ' ', $gateway)),
+                    'gateway_image' => null
+                ];
 
                 DB::table('addon_settings')->updateOrInsert(['key_name' => $gateway, 'settings_type' => 'payment_config'], [
                     'key_name' => $gateway,
@@ -389,10 +394,12 @@ class UpdateController extends Controller
     private function set_sms_data()
     {
         try {
-            $sms_gateway = ['twilio_sms',
+            $sms_gateway = [
+                'twilio_sms',
                 'nexmo_sms',
                 'msg91_sms',
-                '2factor_sms'];
+                '2factor_sms'
+            ];
 
             $data = BusinessSetting::whereIn('key', $sms_gateway)->pluck('value', 'key')->toArray();
             foreach ($data as $key => $value) {
@@ -433,7 +440,8 @@ class UpdateController extends Controller
                         'auth_key' => data_get($decoded_value, 'authkey', null),
                     ];
                 }
-                $data = ['gateway' => $sms_gateway,
+                $data = [
+                    'gateway' => $sms_gateway,
                     'mode' => isset($decoded_value['status']) == 1 ? 'live' : 'test'
                 ];
                 $credentials = json_encode(array_merge($data, $additional_data));

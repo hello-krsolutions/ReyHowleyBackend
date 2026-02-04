@@ -1333,7 +1333,7 @@ class Helpers
                 ],
                 "android" => [
                     "notification" => [
-                        "channelId" => '6ammart',
+                        "channelId" => 'reyhowley',
                     ]
                 ],
                 "apns" => [
@@ -1398,7 +1398,7 @@ class Helpers
                     ],
                     "android" => [
                         "notification" => [
-                            "channelId" => '6ammart',
+                            "channelId" => 'reyhowley',
                         ]
                     ],
                     "apns" => [
@@ -1430,7 +1430,7 @@ class Helpers
                     ],
                     "android" => [
                         "notification" => [
-                            "channelId" => '6ammart',
+                            "channelId" => 'reyhowley',
                         ]
                     ],
                     "apns" => [
@@ -2122,16 +2122,16 @@ class Helpers
                     $image = $image->encode(new WebpEncoder(quality: 80));
                     $format = 'webp';
                 }
-                $imageName = \Carbon\Carbon::now()->toDateString().'-'.uniqid().'.'.$format;
+                $imageName = \Carbon\Carbon::now()->toDateString() . '-' . uniqid() . '.' . $format;
 
-                if (! Storage::disk(self::getDisk())->exists($dir)) {
+                if (!Storage::disk(self::getDisk())->exists($dir)) {
                     Storage::disk(self::getDisk())->makeDirectory($dir);
                 }
 
                 if ($image instanceof UploadedFile) {
                     Storage::disk(self::getDisk())->putFileAs($dir, $image, $imageName);
                 } else {
-                    Storage::disk(self::getDisk())->put($dir.'/'.$imageName, $image->toString());
+                    Storage::disk(self::getDisk())->put($dir . '/' . $imageName, $image->toString());
                 }
 
             } else {
@@ -4731,61 +4731,61 @@ class Helpers
 
     public static function validateFile($image)
     {
-        if (! $image instanceof UploadedFile) {
+        if (!$image instanceof UploadedFile) {
             throw new InvalidUploadException('Invalid file upload.');
         }
 
         if ($image->getSize() > MAX_FILE_SIZE * 1024 * 1024) {
-            throw new InvalidUploadException('File size exceeds the limit of '.MAX_FILE_SIZE.'MB');
+            throw new InvalidUploadException('File size exceeds the limit of ' . MAX_FILE_SIZE . 'MB');
         }
 
-        $allowedExtensions = explode(',', IMAGE_EXTENSION.','.VIDEO_EXTENSION.','.DOCUMENT_EXTENSION.','.AUDIO_EXTENSION.','.FILE_EXTENSION);
+        $allowedExtensions = explode(',', IMAGE_EXTENSION . ',' . VIDEO_EXTENSION . ',' . DOCUMENT_EXTENSION . ',' . AUDIO_EXTENSION . ',' . FILE_EXTENSION);
         $allowedExtensions = array_map(function ($ext) {
             return str_replace('.', '', trim($ext));
         }, $allowedExtensions);
 
         $extension = strtolower($image->getClientOriginalExtension());
 
-        if(!$extension || $extension == '') {
-            $extension= self::extensionFromMimeType($image->getMimeType());
+        if (!$extension || $extension == '') {
+            $extension = self::extensionFromMimeType($image->getMimeType());
         }
 
-        if (! in_array($extension, $allowedExtensions)) {
+        if (!in_array($extension, $allowedExtensions)) {
             throw new InvalidUploadException('File type not allowed.');
         }
     }
 
-   public static function extensionFromMimeType(string $mimeType): string
+    public static function extensionFromMimeType(string $mimeType): string
     {
         $mimeType = strtolower($mimeType);
 
         $map = [
-        // images
-        'image/jpeg' => 'jpg',   // jpeg / jpg
-        'image/png'  => 'png',
-        'image/gif'  => 'gif',
-        'image/webp' => 'webp',
+            // images
+            'image/jpeg' => 'jpg',   // jpeg / jpg
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
 
-        // video
-        'video/mp4'  => 'mp4',
-        'video/webm' => 'webm',
-        'video/ogg'  => 'ogg',
+            // video
+            'video/mp4' => 'mp4',
+            'video/webm' => 'webm',
+            'video/ogg' => 'ogg',
 
-        // audio
-        'audio/mpeg' => 'mp3',
-        'audio/wav'  => 'wav',
-        'audio/ogg'  => 'ogg',
+            // audio
+            'audio/mpeg' => 'mp3',
+            'audio/wav' => 'wav',
+            'audio/ogg' => 'ogg',
 
-        // documents
-        'application/pdf' => 'pdf',
-        'application/msword' => 'doc',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-        'application/vnd.ms-excel' => 'excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
+            // documents
+            'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.ms-excel' => 'excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'excel',
 
-        // archive / misc
-        'application/zip' => 'zip',
-        'application/octet-stream' => 'p8',
+            // archive / misc
+            'application/zip' => 'zip',
+            'application/octet-stream' => 'p8',
         ];
 
         if (isset($map[$mimeType])) {
