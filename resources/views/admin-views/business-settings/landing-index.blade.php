@@ -110,7 +110,7 @@
                                         {{ translate('landing_page_url') }}
                                     </label>
                                     <input type="text"
-                                        placeholder="{{ translate('messages.Ex: https://ReyHowley-web.6amtech.com/') }}"
+                                        placeholder="{{ translate('messages.Ex: https://reyhowley.com/') }}"
                                         class="form-control h--45px" id="redirect_url" name="redirect_url" value="{{ $redirect_url }}">
                                 </div>
                             </div>
