@@ -44,7 +44,7 @@
                 {{translate('messages.software_version')}} : {{env('SOFTWARE_VERSION')}}
             </label>
             <div class="text-center mt-2 small text-muted" style="font-size: 10px; opacity: 0.7;">
-                Deployed: 04 Feb 2026, 05:15 PM
+                Deployed: {{ date('d M Y, h:i A', filemtime(resource_path('views/auth/login.blade.php'))) }}
             </div>
 
             <!-- Card -->
