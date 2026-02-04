@@ -228,13 +228,11 @@ class DashboardController extends Controller
             'business_overview' => $request['business_overview'] ?? 'overall',
         ];
         session()->put('dash_params', $params);
-        $data = self::dashboard_data($request);
-        $total_sell = $data['total_sell'];
-        $commission = $data['commission'];
-        $delivery_commission = $data['delivery_commission'];
-        $label = $data['label'];
+
         $module_type = Config::get('module.current_module_type');
-        if ($module_type == 'settings') {
+
+        // Redirect to settings if no module is set up
+        if ($module_type == 'settings' || empty($module_type)) {
             return redirect()->route('admin.business-settings.business-setup');
         }
         if ($module_type == 'rental' && addon_published_status('Rental') == 1) {
@@ -243,8 +241,36 @@ class DashboardController extends Controller
         if ($module_type == 'rental' && addon_published_status('Rental') == 0) {
             return view('errors.404');
         }
-        return view("admin-views.dashboard-{$module_type}", compact('data', 'total_sell', 'commission', 'delivery_commission', 'label', 'params', 'module_type'));
 
+        // Try to load dashboard data with error handling
+        try {
+            $data = self::dashboard_data($request);
+            $total_sell = $data['total_sell'];
+            $commission = $data['commission'];
+            $delivery_commission = $data['delivery_commission'];
+            $label = $data['label'];
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Dashboard data error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Redirect to business settings if dashboard fails
+            return redirect()->route('admin.business-settings.business-setup')
+                ->with('error', translate('Dashboard loading failed. Please complete your business setup.'));
+        }
+
+        // Check if the view exists
+        $viewName = "admin-views.dashboard-{$module_type}";
+        if (!view()->exists($viewName)) {
+            \Log::error("Dashboard view not found: {$viewName}");
+            return redirect()->route('admin.business-settings.business-setup')
+                ->with('error', translate('Dashboard view not found for module type: ') . $module_type);
+        }
+
+        return view($viewName, compact('data', 'total_sell', 'commission', 'delivery_commission', 'label', 'params', 'module_type'));
     }
 
     public function order(Request $request)

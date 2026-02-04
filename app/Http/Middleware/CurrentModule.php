@@ -20,21 +20,28 @@ class CurrentModule
     public function handle($request, Closure $next)
     {
         if (request()->get('module_id')) {
-            session()->put('current_module',request()->get('module_id'));
+            session()->put('current_module', request()->get('module_id'));
             Config::set('module.current_module_id', request()->get('module_id'));
-        }else{
+        } else {
             Config::set('module.current_module_id', session()->get('current_module'));
         }
 
         $module_id = Config::get('module.current_module_id');
-        $module_id = is_array($module_id)?null:$module_id;
-        $module = isset($module_id)?Module::with('translations')->find($module_id):Module::with('translations')->active()->get()->first();
+        $module_id = is_array($module_id) ? null : $module_id;
+
+        // Wrap database queries in try-catch to handle database connection issues
+        try {
+            $module = isset($module_id) ? Module::with('translations')->find($module_id) : Module::with('translations')->active()->get()->first();
+        } catch (\Exception $e) {
+            \Log::warning('CurrentModule middleware: Database query failed - ' . $e->getMessage());
+            $module = null;
+        }
 
         if ($module) {
             Config::set('module.current_module_id', $module->id);
             Config::set('module.current_module_type', $module->module_type);
             Config::set('module.current_module_name', $module->module_name);
-        }else{
+        } else {
             Config::set('module.current_module_id', null);
             Config::set('module.current_module_type', 'settings');
         }
@@ -58,3 +65,4 @@ class CurrentModule
         return $next($request);
     }
 }
+
