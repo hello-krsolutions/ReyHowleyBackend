@@ -2,69 +2,121 @@
 <html lang="en">
 
 <head>
-    <!-- Required Meta Tags Always Come First -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Title -->
-    <title>{{translate('messages.error')}} 500 |
-        {{\App\Models\BusinessSetting::where(['key' => 'business_name'])->first()->value ?? 'Stack Food'}}</title>
-
-    <!-- Favicon -->
+    <title>Error 500 | Rey Howley</title>
     <link rel="shortcut icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
 
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    <!-- CSS Implementing Plugins -->
-    <link rel="stylesheet" href="{{asset('public/assets/admin')}}/css/vendor.min.css">
-    <link rel="stylesheet" href="{{asset('public/assets/admin')}}/vendor/icon-set/style.css">
+        .error-box {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    <!-- CSS Front Template -->
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/theme.minc619.css?v=1.0')}}">
-    <link rel="stylesheet" href="{{asset('public/assets/admin/css/style.css')}}">
+        h1 {
+            font-size: 80px;
+            margin: 0;
+            color: #333;
+        }
+
+        p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #00aa96;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+            text-align: left;
+            max-width: 800px;
+            overflow-x: auto;
+        }
+
+        .debug-info h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+
+        .debug-info pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+
+        .debug-info .error-message {
+            color: #721c24;
+            font-weight: bold;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- Content -->
     <div class="container">
-        <div class="footer-height-offset d-flex justify-content-center align-items-center flex-column">
-            <div class="row align-items-sm-center w-100">
-                <div class="col-sm-6">
-                    <div class="text-center text-sm-right mr-sm-4 mb-5 mb-sm-0">
-                        <img class="w-60 w-sm-100 mx-auto mw-15rem"
-                            src="{{asset('public/assets/admin')}}/svg/illustrations/think.svg" alt="Image Description">
-                    </div>
-                </div>
-
-                <div class="col-sm-6 col-md-4 text-center text-sm-left">
-                    <h1 class="display-1 mb-0">500</h1>
-                    <p class="lead">{{translate('messages.500_warning_message')}}</p>
-                    <a class="btn btn-primary" href="{{url()->current()}}">{{translate('messages.reload_page')}}</a>
-                </div>
-            </div>
-            <!-- End Row -->
+        <div class="error-box">
+            <h1>500</h1>
+            <p>Server Error</p>
+            <a class="btn" href="{{ url('/') }}">Go Home</a>
+            <a class="btn" href="{{ url()->current() }}">Reload</a>
         </div>
+
+        @if(config('app.debug') === true && isset($exception))
+            <div class="debug-info">
+                <h3>🔧 Debug Information (APP_DEBUG is enabled)</h3>
+                <p class="error-message">{{ $exception->getMessage() }}</p>
+                <p><strong>File:</strong> {{ $exception->getFile() }}</p>
+                <p><strong>Line:</strong> {{ $exception->getLine() }}</p>
+                <h4>Stack Trace:</h4>
+                <pre>{{ $exception->getTraceAsString() }}</pre>
+            </div>
+        @endif
+
+        @if(config('app.debug') === true && !isset($exception))
+            <div class="debug-info">
+                <h3>🔧 Debug Mode Enabled</h3>
+                <p>APP_DEBUG is true, but no exception details were passed to this view.</p>
+                <p>Check <code>storage/logs/laravel.log</code> for error details.</p>
+                <p><strong>Tip:</strong> The error might be happening before the exception handler runs.</p>
+            </div>
+        @endif
     </div>
-    <!-- End Content -->
-
-    <!-- Footer -->
-    <div class="footer text-center">
-        <ul class="list-inline list-separator">
-            <li class="list-inline-item">
-                <a class="list-separator-link" target="_blank"
-                    href="https://reyhowley.com/">{{\App\Models\BusinessSetting::where(['key' => 'business_name'])->first()->value ?? 'Rey Howley'}}
-                    {{translate('messages.support')}}</a>
-            </li>
-        </ul>
-    </div>
-    <!-- End Footer -->
-
-
-    <!-- JS Front -->
-    <script src="{{asset('public/assets/admin')}}/js/theme.min.js"></script>
 </body>
 
 </html>
