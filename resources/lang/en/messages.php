@@ -1,4 +1,4 @@
-<?php return array (
+<?php return array(
   'attributes' => 'Attributes',
   'add_new_attribute' => 'Add new attribute',
   'default' => 'Default',
@@ -1561,7 +1561,7 @@
   'Ex_:_Receive_Latest_News,_Updates_and_Many_Other_News_Every_Week' => 'Ex : Receive Latest News  Updates and Many Other News Every Week',
   'Footer_Article' => 'Footer Article',
   'Write_the_title_within_180_characters' => 'Write the title within 180 characters',
-  'Ex_:_6amMart_is_a_complete_package!__It`s_time_to_empower_your_multivendor_online_business_with__powerful_features!' => 'Ex : 6amMart is a complete package!  It`s time to empower your multivendor online business with  powerful features!',
+  'Ex_:_6amMart_is_a_complete_package!__It`s_time_to_empower_your_multivendor_online_business_with__powerful_features!' => 'Ex : ReyHowley is your ultimate multivendor solution! Empower your business with cutting-edge features and seamless performance.',
   'Browse Web Button' => 'Browse Web Button',
   'Web Link' => 'Web Link',
   'Browse Web Button Enabled for Landing Page' => 'Browse Web Button Enabled for Landing Page',
