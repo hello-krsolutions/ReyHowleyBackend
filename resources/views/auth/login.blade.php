@@ -40,11 +40,15 @@
             </div>
         </div>
         <div class="auth-wrapper-right">
-            <label class="badge badge-soft-success __login-badge">
-                {{translate('messages.software_version')}} : {{env('SOFTWARE_VERSION')}}
-            </label>
-            <div class="text-center mt-2 small text-muted" style="font-size: 10px; opacity: 0.7;">
-                Deployed: {{ date('d M Y, h:i A', filemtime(resource_path('views/auth/login.blade.php'))) }}
+            <div class="__login-badge">
+                <div class="text-right">
+                    <label class="badge badge-soft-success mb-1">
+                        {{translate('messages.software_version')}} : {{env('SOFTWARE_VERSION')}}
+                    </label>
+                    <div class="small text-muted" style="font-size: 10px; opacity: 0.7;">
+                        Deployed: {{ \Carbon\Carbon::createFromTimestamp(filemtime(resource_path('views/auth/login.blade.php')))->timezone('Asia/Kolkata')->format('d M Y, h:i A') }}
+                    </div>
+                </div>
             </div>
 
             <!-- Card -->
