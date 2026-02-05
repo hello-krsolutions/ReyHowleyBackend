@@ -4750,6 +4750,10 @@ class Helpers
             throw new InvalidUploadException('Invalid file upload.');
         }
 
+        if (!$image->isValid()) {
+            throw new InvalidUploadException('File upload failed: ' . $image->getErrorMessage());
+        }
+
         if ($image->getSize() > MAX_FILE_SIZE * 1024 * 1024) {
             throw new InvalidUploadException('File size exceeds the limit of ' . MAX_FILE_SIZE . 'MB');
         }
