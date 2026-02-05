@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -e # Disabled to ensure container always starts
 
 # Ensure storage directory structure exists
 mkdir -p /var/www/html/storage/app/public
@@ -18,9 +18,9 @@ mkdir -p /var/www/html/storage/logs
 # Create storage symlink
 php artisan storage:link || true
 
-# Clear caches to be safe
-php artisan config:clear
-php artisan cache:clear
+# Clear caches to be safe - Non-blocking
+php artisan config:clear || true
+php artisan cache:clear || true
 
 # Execute the passed command (supervisord)
 exec "$@"
