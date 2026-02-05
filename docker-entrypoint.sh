@@ -15,8 +15,11 @@ mkdir -p /var/www/html/storage/logs
 # chown -R www-data:www-data /var/www/html/storage/logs
 # chown -R www-data:www-data /var/www/html/storage/app/public
 
-# Create storage symlink
-php artisan storage:link || true
+# Create storage symlink - Custom logic for 6amMart path structure
+# The code expects URLs like 'storage/app/public/...', so we need to nest the symlink.
+rm -rf /var/www/html/public/storage
+mkdir -p /var/www/html/public/storage/app
+ln -sf /var/www/html/storage/app/public /var/www/html/public/storage/app/public
 
 # Clear caches to be safe - Non-blocking
 php artisan config:clear || true
