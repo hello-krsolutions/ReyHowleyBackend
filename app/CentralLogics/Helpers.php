@@ -2115,10 +2115,25 @@ class Helpers
             if ($image != null) {
                 self::validateFile($image);
 
+                if (!extension_loaded('gd')) {
+                    throw new InvalidUploadException('Server missing GD extension for image processing.');
+                }
+
                 $format = $image->getClientOriginalExtension();
                 if (in_array($format, $validExtForWebp)) {
-                    $manager = new ImageManager(Driver::class);
-                    $image = $manager->read($image);
+                    $manager = new ImageManager(new Driver());
+                    // Use getRealPath() to ensure we point to the actual tmp file
+                    $source = $image instanceof UploadedFile ? $image->getRealPath() : $image;
+
+                    try {
+                        $image = $manager->read($source);
+                    } catch (\Throwable $e) {
+                        // Throw specific error if reading fails, including file info for debug
+                        $debugInfo = ($image instanceof UploadedFile) ?
+                            "Path: " . $image->getRealPath() . ", Size: " . $image->getSize() : "Unknown source";
+                        throw new InvalidUploadException("Unable to read image ($debugInfo): " . $e->getMessage());
+                    }
+
                     $image = $image->encode(new WebpEncoder(quality: 80));
                     $format = 'webp';
                 }
