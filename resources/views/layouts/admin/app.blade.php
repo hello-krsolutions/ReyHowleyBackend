@@ -614,6 +614,7 @@ if (in_array(config('module.current_module_type'), config('module.module_type'))
                     console.log(payload.data)
                     if (payload.data.order_id && payload.data.type == "order_request") {
                         @php($admin_order_notification = \App\CentralLogics\Helpers::get_business_settings('admin_order_notification') ?? 0)
+                        @php($order_notification_type = \App\CentralLogics\Helpers::get_business_settings('order_notification_type') ?? 'manual')
                         @if (\App\CentralLogics\Helpers::module_permission_check('order') && $admin_order_notification && $order_notification_type == 'firebase')
                             new_order_type = payload.data.order_type
                             new_module_id = payload.data.module_id
