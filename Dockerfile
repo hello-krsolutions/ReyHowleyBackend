@@ -1,5 +1,7 @@
 FROM php:8.2-fpm
 
+# Rebuild trigger: 2026-02-05 - Force rebuild to install GD extension
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
