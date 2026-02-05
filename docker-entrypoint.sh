@@ -13,6 +13,7 @@ mkdir -p /var/www/html/storage/logs
 # chmod -R 775 /var/www/html/storage
 chown -R www-data:www-data /var/www/html/storage/framework
 chown -R www-data:www-data /var/www/html/storage/logs
+chown -R www-data:www-data /var/www/html/storage/app/public
 
 # Create storage symlink
 php artisan storage:link || true

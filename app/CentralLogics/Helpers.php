@@ -2141,7 +2141,7 @@ class Helpers
             throw $e;
         } catch (\Throwable $e) {
             throw new InvalidUploadException(
-                'Image upload failed. Please try again.'
+                'Image upload failed: ' . $e->getMessage()
             );
         }
 
