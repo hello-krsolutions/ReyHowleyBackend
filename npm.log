@@ -1,0 +1,21 @@
+
+> watch
+> mix watch
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ℹ Compiling Mix
+
+[1;1H[0J
+                         
+   Laravel Mix v6.0.49   
+                         
+
+✔ Compiled Successfully in 609ms
+[90m┌───────────────────────────────────[39m[90m┬─────────┐[39m
+[90m│[39m                              File [90m│[39m Size    [90m│[39m
+[90m├───────────────────────────────────[39m[90m┼─────────┤[39m
+[90m│[39m                        /js/app.js [90m│[39m 775 KiB [90m│[39m
+[90m│[39m                       css/app.css [90m│[39m 1 bytes [90m│[39m
+[90m└───────────────────────────────────[39m[90m┴─────────┘[39m
+✔ Mix: Compiled successfully in 622.57ms
+webpack compiled successfully
