@@ -18,4 +18,4 @@ docker-local/
 /public/.well-known
 .idea/
 .vscode/
-.ddev/
+.ddev/*.log
